@@ -16,14 +16,16 @@ namespace FileSystemWatcherLibrary.Services.Foundation
         public void ListenToCreateEvents(Action<string> handler)
             => broker.ListenToEvents((eventArgs) => 
             {
-                if(eventArgs.ChangeType == WatcherChangeTypes.Created)
+                System.IO.FileInfo fi = new FileInfo(eventArgs.FullPath);
+
+                if(eventArgs.ChangeType == WatcherChangeTypes.Created && fi.CreationTime.ToString() == fi.LastWriteTime.ToString())
                     handler(eventArgs.FullPath.Replace('\\', '/'));
             });
 
         public void ListenToUpdateEvents(Action<string> handler)
             => broker.ListenToEvents((eventArgs) => 
             {
-                if(eventArgs.ChangeType == WatcherChangeTypes.Changed || eventArgs.ChangeType == WatcherChangeTypes.Renamed)
+                if(!(eventArgs.ChangeType == WatcherChangeTypes.Deleted))
                     handler(eventArgs.FullPath.Replace('\\', '/'));
             });
 
