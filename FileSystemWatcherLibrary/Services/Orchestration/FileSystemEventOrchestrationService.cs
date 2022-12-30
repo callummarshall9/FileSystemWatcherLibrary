@@ -81,6 +81,9 @@ namespace FileSystemWatcherLibrary.Services.Orchestration
 
             if (!laterDeleted)
             {
+                //Operating systems are weird...
+                RemoveFutureCreatedEvents(relatedEvents);
+
                 RemoveFutureChangeEvents(relatedEvents);
 
                 eventService.RaiseCreateEvent(eventToHandle.Path);
@@ -104,6 +107,17 @@ namespace FileSystemWatcherLibrary.Services.Orchestration
             }
             else
                 foreach (var fileSystemEvent in relatedEvents)
+                    fileSystemEventQueueService.RemoveFileSystemEventFromQueue(fileSystemEvent);
+        }
+
+        private void RemoveFutureCreatedEvents(IEnumerable<FileSystemEvent> relatedEvents)
+        {
+            IEnumerable<FileSystemEvent> createdEvents = relatedEvents.Where(r => r.ChangeKind == FileSystemEventEnum.Created).ToArray();
+
+            bool laterChanged = createdEvents.Any();
+
+            if (laterChanged)
+                foreach (var fileSystemEvent in createdEvents)
                     fileSystemEventQueueService.RemoveFileSystemEventFromQueue(fileSystemEvent);
         }
 
