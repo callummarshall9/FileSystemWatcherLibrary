@@ -5,6 +5,6 @@ namespace FileSystemWatcherLibrary.Brokers
 {
     public interface IFileSystemEventBroker 
     {
-        public void ListenToEvents(Action<FileSystemEventArgs> handler);
+        void ListenToEvents(Action<FileSystemEventArgs> handler);
     }
 }
